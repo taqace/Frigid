@@ -1,0 +1,54 @@
+data_items = ListProperty([])
+    connection = sqlite3.connect("database\kartik.db")
+    cursor = connection.cursor()
+    sqlString = "SELECT DISTINCT box FROM employees"
+
+    def __init__(self, **kwargs):
+        super(MainScreen, self).__init__(**kwargs)
+        self.get_submit()
+
+    def get_submit(self):
+        self.cursor.execute(self.sqlString)
+        rows = self.cursor.fetchall()
+        self.create_data_items(rows)
+        print(self.data_items)
+
+    # create data_items
+    def create_data_items(self,rows):
+        if not self.data_items:
+            for row in rows:
+                for col in row:
+                    self.data_items.append(col)
+        else:
+            self.data_items.clear()
+            for row in rows:
+                for col in row:
+                    self.data_items.append(col)
+
+
+
+BoxLayout:
+        orientation: 'vertical'
+          
+        BoxLayout:
+            orientation:'vertical'
+            padding:'20px'
+            size_hint_y:.5
+            BoxLayout:
+                orientation:'horizontal'
+                Button:
+                    text:'test1'
+                Button:
+                    text:'test2'
+                Button:
+                    text:'test3'
+            BoxLayout:
+                orientation:'horizontal'
+                Button:
+                    text:'test1'
+                Button:
+                    text:'test2'
+                Button:
+                    text:'test3'
+            
+                    

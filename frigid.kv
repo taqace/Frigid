@@ -1,0 +1,72 @@
+#:kivy 2.0.0
+
+
+MyScreenManager:
+    MainScreen:
+        name: 'mainScreen'
+
+<MAINSCREEN>
+    BoxLayout:
+        orientation: 'vertical'
+        RV: 
+
+        BoxLayout:
+            orientation:'vertical'
+            padding:'20px'
+            size_hint_y:.4
+            BoxLayout:
+                orientation:'horizontal'
+                Button:
+                    text:'test1'
+                Button:
+                    text:'test2'
+                Button:
+                    text:'test3'
+            BoxLayout:
+                orientation:'horizontal'
+                Button:
+                    text:'test1'
+                Button:
+                    text:'test2'
+                Button:
+                    text:'test3'
+
+<SelectableButton>:
+    # Draw a background to indicate selection
+    canvas.before:
+        Color:
+            rgba: (.0, 0.9, .1, .3) if self.selected else (0, 0, 0, 1)
+        Rectangle:
+            pos: self.pos
+            size: self.size
+
+            
+<RV>:
+    BoxLayout:
+        orientation: "vertical"
+        BoxLayout:
+            padding: [20,20,20,0]
+            spacing: 10
+            orientation: "horizontal"
+            size_hint_y: .2
+            TextInput:
+                text:'type here'
+            Button:
+                text:'search'
+                size_hint_x:.2
+        BoxLayout:
+            RecycleView:
+                viewclass: 'SelectableButton'
+                data: [{'text': str(x)} for x in root.data_items]
+                SelectableRecycleGridLayout:
+					id: rv
+                    cols: 2
+                    padding: [20,20,20,0]
+                    default_size: None, dp(50)
+                    default_size_hint: 1,None
+                    size_hint_y: None
+                    height: self.minimum_height
+                    multiselect: True
+                    touch_multiselect: True
+					on_touch_down:
+						root.selectable_button_function()
