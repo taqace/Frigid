@@ -45,15 +45,17 @@ MyScreenManager:
     BoxLayout:
         orientation: "vertical"
         BoxLayout:
-            padding: [20,20,20,0]
+            padding: [20,20,20,20]
             spacing: 10
             orientation: "horizontal"
-            size_hint_y: .2
+            size_hint_y: .3
             TextInput:
-                text:'type here'
+                on_text: root.search_function(self.text)
             Button:
                 text:'search'
                 size_hint_x:.2
+                on_press:
+                    root.search_function()
         BoxLayout:
             RecycleView:
                 viewclass: 'SelectableButton'
@@ -61,7 +63,7 @@ MyScreenManager:
                 SelectableRecycleGridLayout:
 					id: rv
                     cols: 2
-                    padding: [20,20,20,0]
+                    padding: [20,0,20,0]
                     default_size: None, dp(50)
                     default_size_hint: 1,None
                     size_hint_y: None

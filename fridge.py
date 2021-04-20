@@ -15,13 +15,12 @@ from kivy.uix.recycleview import RecycleView
 from kivy.uix.recycleview.views import RecycleDataViewBehavior
 from kivy.uix.button import Button
 from kivy.uix.recyclegridlayout import RecycleGridLayout
-from kivy.properties import ListProperty,BooleanProperty
+from kivy.properties import ListProperty,BooleanProperty,StringProperty
 
 #test commit
 
 global connection
 connection = sqlite3.connect("database\kartik.db")
-
 
 
 #1024x600
@@ -63,6 +62,7 @@ class RV(BoxLayout):
 
     cursor = connection.cursor()
     data_items = ListProperty([])
+    search = StringProperty('testing')
     sqlString = "SELECT DISTINCT box FROM employees"
 
     def __init__(self, **kwargs):
@@ -89,9 +89,12 @@ class RV(BoxLayout):
 
     def selectable_button_function(self):
         
-        print('a')
+        print(self.data_items)
 
-       
+    def search_function(self,text):
+        self.data_items.clear()
+        self.data_items.append(text)
+        print(self.data_items)
 
 presentation = Builder.load_file("frigid.kv")
 class MyApp(App):
