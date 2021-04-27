@@ -15,7 +15,7 @@ from kivy.uix.recycleview import RecycleView
 from kivy.uix.recycleview.views import RecycleDataViewBehavior
 from kivy.uix.button import Button
 from kivy.uix.recyclegridlayout import RecycleGridLayout
-from kivy.properties import ListProperty,BooleanProperty,StringProperty
+from kivy.properties import ObjectProperty,ListProperty,BooleanProperty,StringProperty
 
 #test commit
 
@@ -27,8 +27,11 @@ connection = sqlite3.connect("database\kartik.db")
 class MyScreenManager(ScreenManager):
     pass
 
+
 class MainScreen(Screen):
-    pass
+    
+    def test(self):
+        print(self.ids.rv.ids.gg.text)
 
 class SelectableRecycleGridLayout(FocusBehavior, LayoutSelectionBehavior,RecycleGridLayout):
     ''' Adds selection and focus behaviour to the view. '''
@@ -63,14 +66,17 @@ class RV(BoxLayout):
     cursor = connection.cursor()
     data_items = ListProperty([])
     search = StringProperty('testing')
-    sqlString = "SELECT DISTINCT box FROM employees"
+    defaultString = "SELECT DISTINCT box FROM employees"
+    searchString = ""
+
+    ggg = ObjectProperty()
 
     def __init__(self, **kwargs):
         super(RV, self).__init__(**kwargs)
         self.get_submit()
 
     def get_submit(self):
-        self.cursor.execute(self.sqlString)
+        self.cursor.execute(self.defaultString)
         rows = self.cursor.fetchall()
         self.create_data_items(rows)
 
@@ -89,12 +95,23 @@ class RV(BoxLayout):
 
     def selectable_button_function(self):
         
-        print(self.data_items)
+        self.ids.gg.text = "testing"
 
     def search_function(self,text):
+        split = text.split()
+        column_list = ["contents","contact","note1","note2"]
+        param_dict = { "param_" + str(i) : "%" + split[i] + "%" for (i,v) in enumerate(split) }
+        cross_list = [col + " LIKE :param_" + str(i) for i in range(len(split)) for col in column_list]
+        sql = "SELECT box,position" + " FROM employees WHERE " + " OR ".join(cross_list)
+        sqlSearch = self.cursor.execute(sql,param_dict)
+
         self.data_items.clear()
-        self.data_items.append(text)
-        print(self.data_items)
+
+        for box in sqlSearch:
+            self.data_items.append(box[0]+"-"+box[1])
+        
+
+        
 
 presentation = Builder.load_file("frigid.kv")
 class MyApp(App):

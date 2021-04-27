@@ -8,7 +8,8 @@ MyScreenManager:
 <MAINSCREEN>
     BoxLayout:
         orientation: 'vertical'
-        RV: 
+        RV:
+            id:rv
 
         BoxLayout:
             orientation:'vertical'
@@ -18,6 +19,7 @@ MyScreenManager:
                 orientation:'horizontal'
                 Button:
                     text:'test1'
+                    on_press: root.test()
                 Button:
                     text:'test2'
                 Button:
@@ -42,6 +44,7 @@ MyScreenManager:
 
             
 <RV>:
+    ggg:gg
     BoxLayout:
         orientation: "vertical"
         BoxLayout:
@@ -52,10 +55,11 @@ MyScreenManager:
             TextInput:
                 on_text: root.search_function(self.text)
             Button:
+                id: gg
                 text:'search'
                 size_hint_x:.2
                 on_press:
-                    root.search_function()
+                    root.search_function(self.text)
         BoxLayout:
             RecycleView:
                 viewclass: 'SelectableButton'
