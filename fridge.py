@@ -33,6 +33,9 @@ class MainScreen(Screen):
     def test(self):
         print(self.ids.rv.ids.gg.text)
 
+class BoxScreen(Screen):
+    pass
+
 class SelectableRecycleGridLayout(FocusBehavior, LayoutSelectionBehavior,RecycleGridLayout):
     ''' Adds selection and focus behaviour to the view. '''
 
@@ -50,35 +53,43 @@ class SelectableButton(RecycleDataViewBehavior, Button):
     def on_touch_down(self, touch):
         ''' Add selection on touch down '''
         if super(SelectableButton, self).on_touch_down(touch):
+            App.get_running_app().root.ids.mainScreen.ids.rv.selectable_button_function(self.text)
+            print(self.text)
             return True
         if self.collide_point(*touch.pos) and self.selectable:
             return self.parent.select_with_touch(self.index, touch)
 
+
     def apply_selection(self, rv, index, is_selected):
         ''' Respond to the selection of items in the view. '''
         self.selected = is_selected
-
-    def update_changes(self, txt):
-        self.text = txt
 
 class RV(BoxLayout):
 
     cursor = connection.cursor()
     data_items = ListProperty([])
     search = StringProperty('testing')
-    defaultString = "SELECT DISTINCT box FROM employees"
+    filterBy = "default"
     searchString = ""
 
-    ggg = ObjectProperty()
+    ggg = StringProperty("A")
 
     def __init__(self, **kwargs):
         super(RV, self).__init__(**kwargs)
         self.get_submit()
+    
+    def get_submit(self,text = "SELECT DISTINCT box FROM employees",boxName=None):
 
-    def get_submit(self):
-        self.cursor.execute(self.defaultString)
-        rows = self.cursor.fetchall()
-        self.create_data_items(rows)
+        if boxName != None:
+            self.data_items.clear()           
+            search = self.cursor.execute("SELECT position FROM employees WHERE box=?",(boxName,))
+            for i in search:
+                self.data_items.append(boxName+"-"+i[0])
+
+        else:
+            self.cursor.execute(text)
+            rows = self.cursor.fetchall()
+            self.create_data_items(rows)
 
     # create data_items
     def create_data_items(self,rows):
@@ -93,9 +104,20 @@ class RV(BoxLayout):
                 for col in row:
                     self.data_items.append(col)
 
-    def selectable_button_function(self):
+    def selectable_button_function(self,box = "None"):
         
-        self.ids.gg.text = "testing"
+        if self.filterBy == 'default':
+            self.filterBy = 'box'
+            query = "SELECT position FROM employees WHERE box=?"
+            self.get_submit(query,box)
+        elif self.filterBy == 'box':
+            App.get_running_app().root.current = 'boxScreen'
+        elif self.filterBy == 'contents':
+            self.get_submit("SELECT DISTINCT contents FROM employees")
+        elif self.filterBy == 'contact':
+            self.get_submit("SELECT DISTINCT contact FROM employees")
+        
+       
 
     def search_function(self,text):
         split = text.split()

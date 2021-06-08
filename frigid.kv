@@ -3,7 +3,11 @@
 
 MyScreenManager:
     MainScreen:
+        id: mainScreen
         name: 'mainScreen'
+    BoxScreen:
+        id: boxScreen
+        name: 'boxScreen'
 
 <MAINSCREEN>
     BoxLayout:
@@ -32,6 +36,62 @@ MyScreenManager:
                     text:'test2'
                 Button:
                     text:'test3'
+<BOXSCREEN>:
+    BoxLayout:
+        orientation: 'vertical'
+        Label:
+            id: boxName
+            font_size: 40
+            text: 'TestBox'
+            size_hint_y:.15
+        BoxLayout:
+            orientation:'horizontal'
+            GridLayout:
+                cols: 2
+                padding:[20,100,20,100]
+                spacing:20
+                Label:
+                    text: 'Contact:'
+                    font_size:25
+                    size_hint_x:None
+                    width:150
+                TextInput:
+                Label:
+                    text: 'Contents:'
+                    font_size:25
+                    size_hint_x:None
+                    width:150
+                TextInput:
+                Label:
+                    text: 'Quantity:'
+                    font_size:25
+                    size_hint_x:None
+                    width:150
+                TextInput:
+            BoxLayout:
+                orientation:'vertical'
+                padding:20
+                spacing:10
+                Label:
+                    text: 'Note:'
+                    font_size:25
+                    size_hint_y:.075
+                    text_size:self.size
+                    halign: 'left'
+                TextInput:
+        BoxLayout:
+            orientation:'horizontal'
+            size_hint_y:.3
+            spacing:5
+            padding:20
+            Button:
+                text:'Back'
+            Button:
+                text:'Remove Entry'
+                background_color:'lightcoral'
+            Button:
+                text:'Update'
+            
 
 <SelectableButton>:
     # Draw a background to indicate selection
@@ -44,7 +104,6 @@ MyScreenManager:
 
             
 <RV>:
-    ggg:gg
     BoxLayout:
         orientation: "vertical"
         BoxLayout:
@@ -55,7 +114,7 @@ MyScreenManager:
             TextInput:
                 on_text: root.search_function(self.text)
             Button:
-                id: gg
+                
                 text:'search'
                 size_hint_x:.2
                 on_press:
@@ -72,7 +131,9 @@ MyScreenManager:
                     default_size_hint: 1,None
                     size_hint_y: None
                     height: self.minimum_height
-                    multiselect: True
+                    multiselect: False
                     touch_multiselect: True
-					on_touch_down:
-						root.selectable_button_function()
+					
+                        
+                        
+                        
