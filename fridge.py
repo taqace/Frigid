@@ -15,7 +15,7 @@ from kivy.uix.recycleview import RecycleView
 from kivy.uix.recycleview.views import RecycleDataViewBehavior
 from kivy.uix.button import Button
 from kivy.uix.recyclegridlayout import RecycleGridLayout
-from kivy.properties import ListProperty,BooleanProperty,StringProperty
+from kivy.properties import ObjectProperty,ListProperty,BooleanProperty,StringProperty
 
 #test commit
 
@@ -27,7 +27,13 @@ connection = sqlite3.connect("database\kartik.db")
 class MyScreenManager(ScreenManager):
     pass
 
+
 class MainScreen(Screen):
+    
+    def test(self):
+        print(self.ids.rv.ids.gg.text)
+
+class BoxScreen(Screen):
     pass
 
 class SelectableRecycleGridLayout(FocusBehavior, LayoutSelectionBehavior,RecycleGridLayout):
@@ -47,32 +53,43 @@ class SelectableButton(RecycleDataViewBehavior, Button):
     def on_touch_down(self, touch):
         ''' Add selection on touch down '''
         if super(SelectableButton, self).on_touch_down(touch):
+            App.get_running_app().root.ids.mainScreen.ids.rv.selectable_button_function(self.text)
+            print(self.text)
             return True
         if self.collide_point(*touch.pos) and self.selectable:
             return self.parent.select_with_touch(self.index, touch)
 
+
     def apply_selection(self, rv, index, is_selected):
         ''' Respond to the selection of items in the view. '''
         self.selected = is_selected
-
-    def update_changes(self, txt):
-        self.text = txt
 
 class RV(BoxLayout):
 
     cursor = connection.cursor()
     data_items = ListProperty([])
     search = StringProperty('testing')
-    sqlString = "SELECT DISTINCT box FROM employees"
+    filterBy = "default"
+    searchString = ""
+
+    ggg = StringProperty("A")
 
     def __init__(self, **kwargs):
         super(RV, self).__init__(**kwargs)
         self.get_submit()
+    
+    def get_submit(self,text = "SELECT DISTINCT box FROM employees",boxName=None):
 
-    def get_submit(self):
-        self.cursor.execute(self.sqlString)
-        rows = self.cursor.fetchall()
-        self.create_data_items(rows)
+        if boxName != None:
+            self.data_items.clear()           
+            search = self.cursor.execute("SELECT position FROM employees WHERE box=?",(boxName,))
+            for i in search:
+                self.data_items.append(boxName+"-"+i[0])
+
+        else:
+            self.cursor.execute(text)
+            rows = self.cursor.fetchall()
+            self.create_data_items(rows)
 
     # create data_items
     def create_data_items(self,rows):
@@ -87,14 +104,36 @@ class RV(BoxLayout):
                 for col in row:
                     self.data_items.append(col)
 
-    def selectable_button_function(self):
+    def selectable_button_function(self,box = "None"):
         
-        print(self.data_items)
+        if self.filterBy == 'default':
+            self.filterBy = 'box'
+            query = "SELECT position FROM employees WHERE box=?"
+            self.get_submit(query,box)
+        elif self.filterBy == 'box':
+            App.get_running_app().root.current = 'boxScreen'
+        elif self.filterBy == 'contents':
+            self.get_submit("SELECT DISTINCT contents FROM employees")
+        elif self.filterBy == 'contact':
+            self.get_submit("SELECT DISTINCT contact FROM employees")
+        
+       
 
     def search_function(self,text):
+        split = text.split()
+        column_list = ["contents","contact","note1","note2"]
+        param_dict = { "param_" + str(i) : "%" + split[i] + "%" for (i,v) in enumerate(split) }
+        cross_list = [col + " LIKE :param_" + str(i) for i in range(len(split)) for col in column_list]
+        sql = "SELECT box,position" + " FROM employees WHERE " + " OR ".join(cross_list)
+        sqlSearch = self.cursor.execute(sql,param_dict)
+
         self.data_items.clear()
-        self.data_items.append(text)
-        print(self.data_items)
+
+        for box in sqlSearch:
+            self.data_items.append(box[0]+"-"+box[1])
+        
+
+        
 
 presentation = Builder.load_file("frigid.kv")
 class MyApp(App):
